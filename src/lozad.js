@@ -6,6 +6,7 @@
 const isIE = document.documentMode
 
 const defaultConfig = {
+  root: null,
   rootMargin: '0px',
   threshold: 0,
   load(element) {
@@ -49,22 +50,26 @@ const onIntersection = (load, loaded) => (entries, observer) => {
   })
 }
 
-const getElements = selector => {
+const getElements = (root, selector) => {
   if (selector instanceof Element) {
     return [selector]
   }
   if (selector instanceof NodeList) {
     return selector
   }
-  return document.querySelectorAll(selector)
+  if (!root || !(root instanceof Element)) {
+    root = document
+  }
+  return root.querySelectorAll(selector)
 }
 
 export default function (selector = '.lozad', options = {}) {
-  const {rootMargin, threshold, load, loaded} = {...defaultConfig, ...options}
+  const {root, rootMargin, threshold, load, loaded} = {...defaultConfig, ...options}
   let observer
 
   if (window.IntersectionObserver) {
     observer = new IntersectionObserver(onIntersection(load, loaded), {
+      root,
       rootMargin,
       threshold
     })
@@ -72,7 +77,7 @@ export default function (selector = '.lozad', options = {}) {
 
   return {
     observe() {
-      const elements = getElements(selector)
+      const elements = getElements(root, selector)
 
       for (let i = 0; i < elements.length; i++) {
         if (isLoaded(elements[i])) {

@@ -39,6 +39,26 @@ describe('lozad', () => {
     })
   })
 
+  describe('images inside root container without class lozad', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div id="wrapper"><div id="root"></div></div>'
+      const image = document.createElement('img')
+      image.dataset.src = Math.random()
+        .toString(36)
+        .substring(7)
+      document.getElementById('root').appendChild(image)
+    })
+
+    it('should not load image', () => {
+      const observer = lozad('.lozad', {
+        root: document.getElementById('root')
+      })
+      observer.observe()
+      const image = document.getElementsByTagName('img')[0]
+      assert.equal(undefined, image.dataset.loaded)
+    })
+  })
+
   describe('images inside viewport with class lozad', () => {
     beforeEach(() => {
       document.body.innerHTML = ''
@@ -65,6 +85,55 @@ describe('lozad', () => {
     })
   })
 
+  describe('images inside root container with class lozad', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div id="wrapper"><div id="root"></div></div>'
+      const image = document.createElement('img')
+      image.dataset.src = Math.random()
+        .toString(36)
+        .substring(7)
+      image.setAttribute('class', 'lozad')
+      document.getElementById('root').appendChild(image)
+    })
+
+    it('should not load an image till observe function is called', () => {
+      lozad()
+      const image = document.getElementsByTagName('img')[0]
+      assert.equal(undefined, image.dataset.loaded)
+    })
+
+    it('should load an image after observe function is called', () => {
+      const observer = lozad('.lozad', {
+        root: document.getElementById('root')
+      })
+      const image = document.getElementsByTagName('img')[0]
+      observer.observe()
+      assert.equal('true', image.dataset.loaded)
+      assert.equal(image.getAttribute('src'), image.dataset.src)
+    })
+  })
+
+  describe('images outside root container with class lozad', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div id="wrapper"><div id="root"></div></div>'
+      const image = document.createElement('img')
+      image.dataset.src = Math.random()
+        .toString(36)
+        .substring(7)
+      image.setAttribute('class', 'lozad')
+      document.getElementById('wrapper').appendChild(image)
+    })
+
+    it('should not load an image even after observe function is called', () => {
+      const observer = lozad('.lozad', {
+        root: document.getElementById('root')
+      })
+      const image = document.getElementsByTagName('img')[0]
+      observer.observe()
+      assert.equal(undefined, image.dataset.loaded)
+    })
+  })
+
   describe('images inside viewport with different class', () => {
     beforeEach(() => {
       document.body.innerHTML = ''
@@ -73,6 +142,27 @@ describe('lozad', () => {
         .toString(36)
         .substring(7)
       document.body.appendChild(image)
+    })
+
+    it('should load the image', () => {
+      const className = 'test-class'
+      const observer = lozad('.' + className)
+      const image = document.getElementsByTagName('img')[0]
+      image.setAttribute('class', className)
+      observer.observe()
+      assert.equal('true', image.dataset.loaded)
+      assert.equal(image.getAttribute('src'), image.dataset.src)
+    })
+  })
+
+  describe('images inside root container with different class', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div id="wrapper"><div id="root"></div></div>'
+      const image = document.createElement('img')
+      image.dataset.src = Math.random()
+        .toString(36)
+        .substring(7)
+      document.getElementById('root').appendChild(image)
     })
 
     it('should load the image', () => {
@@ -153,6 +243,40 @@ describe('lozad', () => {
     it('should load the image with data-background-image attribute', () => {
       const bgImageAttr = 'test-bg-image'
       const observer = lozad()
+      const image = document.getElementsByTagName('img')[0]
+      image.setAttribute('class', 'lozad')
+      image.setAttribute('data-background-image', bgImageAttr)
+      observer.observe()
+      assert.equal('true', image.dataset.loaded)
+      assert.equal(image.style.backgroundImage, 'url(' + bgImageAttr + ')')
+    })
+  })
+
+  describe('images inside root container with different attributes', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div id="wrapper"><div id="root"></div></div>'
+      const image = document.createElement('img')
+      document.getElementById('root').appendChild(image)
+    })
+
+    it('should load the image with data-srcset attribute', () => {
+      const dataSrcSetAttr = 'test-srcset'
+      const observer = lozad('.lozad', {
+        root: document.getElementById('root')
+      })
+      const image = document.getElementsByTagName('img')[0]
+      image.setAttribute('class', 'lozad')
+      image.setAttribute('data-srcset', dataSrcSetAttr)
+      observer.observe()
+      assert.equal('true', image.dataset.loaded)
+      assert.equal(image.getAttribute('srcset'), dataSrcSetAttr)
+    })
+
+    it('should load the image with data-background-image attribute', () => {
+      const bgImageAttr = 'test-bg-image'
+      const observer = lozad('.lozad', {
+        root: document.getElementById('root')
+      })
       const image = document.getElementsByTagName('img')[0]
       image.setAttribute('class', 'lozad')
       image.setAttribute('data-background-image', bgImageAttr)

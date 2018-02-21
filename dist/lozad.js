@@ -1,4 +1,4 @@
-/*! lozad.js - v1.3.0 - 2018-02-16
+/*! lozad.js - v1.3.0 - 2018-02-21
 * https://github.com/ApoorvSaxena/lozad.js
 * Copyright (c) 2018 Apoorv Saxena; Licensed MIT */
 
@@ -19,6 +19,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var isIE = document.documentMode;
 
 var defaultConfig = {
+  root: null,
   rootMargin: '0px',
   threshold: 0,
   load: function load(element) {
@@ -66,14 +67,17 @@ var onIntersection = function onIntersection(load, loaded) {
   };
 };
 
-var getElements = function getElements(selector) {
+var getElements = function getElements(root, selector) {
   if (selector instanceof Element) {
     return [selector];
   }
   if (selector instanceof NodeList) {
     return selector;
   }
-  return document.querySelectorAll(selector);
+  if (!root || !(root instanceof Element)) {
+    root = document;
+  }
+  return root.querySelectorAll(selector);
 };
 
 var lozad = function () {
@@ -81,6 +85,7 @@ var lozad = function () {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var _defaultConfig$option = _extends({}, defaultConfig, options),
+      root = _defaultConfig$option.root,
       rootMargin = _defaultConfig$option.rootMargin,
       threshold = _defaultConfig$option.threshold,
       load = _defaultConfig$option.load,
@@ -90,6 +95,7 @@ var lozad = function () {
 
   if (window.IntersectionObserver) {
     observer = new IntersectionObserver(onIntersection(load, loaded), {
+      root: root,
       rootMargin: rootMargin,
       threshold: threshold
     });
@@ -97,7 +103,7 @@ var lozad = function () {
 
   return {
     observe: function observe() {
-      var elements = getElements(selector);
+      var elements = getElements(root, selector);
 
       for (var i = 0; i < elements.length; i++) {
         if (isLoaded(elements[i])) {

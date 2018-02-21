@@ -81,7 +81,7 @@ All you need to do now is just instantiate Lozad as follows:
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
 ```
-or with a DOM `Element` reference:
+or with a DOM `Element` reference (cannot be combined with the `root` custom option):
 ```js
 const el = document.querySelector('img');
 const observer = lozad(el); // passing a `NodeList` (e.g. `document.querySelectorAll()`) is also valid
@@ -90,6 +90,7 @@ observer.observe();
 or with custom options:
 ```js
 const observer = lozad('.lozad', {
+    root: document.querySelector('#root'), // the observer's target element
     rootMargin: '10px 0px', // syntax similar to that of CSS Margin
     threshold: 0.1 // ratio of element convergence
 });
@@ -97,6 +98,7 @@ observer.observe();
 ```
 Reference:
 
+ - [IntersectionObserver options: root](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/root)
  - [IntersectionObserver options: rootMargin](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/rootMargin)
  - [IntersectionObserver options: thresholds](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/thresholds)
 
